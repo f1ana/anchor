@@ -61,6 +61,7 @@ const port =
     ? parseInt(Deno.env.get("PORT")!, 10)
     : 43385;
 let quietMode = !!Deno.env.has("QUIET");
+const stats_file = Deno.env.get("STATS_FILE") || "./stats.json";
 
 class Server {
   private listener?: Deno.Listener;
@@ -85,7 +86,7 @@ class Server {
 
   async parseStats() {
     try {
-      const statsString = await Deno.readTextFile("./stats.json");
+      const statsString = await Deno.readTextFile(stats_file);
       this.stats = Object.assign(this.stats, JSON.parse(statsString));
       this.stats.pid = Deno.pid;
       this.log("Loaded stats file");
@@ -128,7 +129,7 @@ class Server {
   async saveStats() {
     try {
       await Deno.writeTextFile(
-        "./stats.json",
+        stats_file,
         JSON.stringify(this.stats, null, 4),
       );
     } catch (error) {
